@@ -1,0 +1,999 @@
+/* Ruta: styles.css */
+
+/* Efectos de vidrio */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ✨ BLOQUEO DE SCROLL CUANDO OVERLAYS ESTÁN ACTIVOS */
+body.overlay-active {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+/* MAPA STICKY MEJORADO Y CORREGIDO */
+.map-sticky {
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 1279px) {
+    .map-sticky {
+        position: relative;
+        top: 0;
+    }
+}
+
+/* Mejoras para el contenedor del mapa sticky */
+.map-sticky .glass-effect {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Cuando está en fullscreen, desactivar sticky */
+.map-container-fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 10000 !important;
+    border-radius: 0 !important;
+}
+
+.map-container-fullscreen .map-sticky {
+    position: static !important;
+}
+
+/* Notificaciones optimizadas */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    z-index: 12000;
+    transform: translateX(400px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.notification.success {
+    background: rgba(34, 197, 94, 0.9);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.notification.error {
+    background: rgba(239, 68, 68, 0.9);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.notification.warning {
+    background: rgba(245, 158, 11, 0.9);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.notification.info {
+    background: rgba(59, 130, 246, 0.9);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f4f6;
+    border-top: 4px solid #dc2626;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Botón de pantalla completa optimizado */
+.fullscreen-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 120px;
+    min-height: 44px;
+    justify-content: center;
+}
+
+.fullscreen-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* BOTÓN DE CERRAR EN FULLSCREEN - ÁREA GRANDE */
+.map-container-fullscreen .fullscreen-btn {
+    padding: 15px 25px;
+    font-size: 16px;
+    min-width: 140px;
+    min-height: 50px;
+    top: 20px;
+    right: 20px;
+    background: rgba(220, 38, 38, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.map-container-fullscreen .fullscreen-btn:hover {
+    background: rgba(185, 28, 28, 0.95);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(220, 38, 38, 0.4);
+}
+
+/* Área de click expandida para mobile */
+.map-container-fullscreen .fullscreen-btn::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: transparent;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .map-container-fullscreen .fullscreen-btn {
+        padding: 18px 28px;
+        font-size: 18px;
+        min-width: 160px;
+        min-height: 60px;
+        top: 15px;
+        right: 15px;
+    }
+    
+    .map-container-fullscreen .fullscreen-btn::before {
+        top: -15px;
+        left: -15px;
+        right: -15px;
+        bottom: -15px;
+    }
+}
+
+/* Pantalla completa corregida */
+.map-fullscreen-active {
+    overflow: hidden;
+}
+
+.map-container-fullscreen #map {
+    height: 100vh !important;
+}
+
+/* Overlays del dashboard CON MEJORAS DE PRIORIDAD */
+.overlay-dashboard {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 11000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.overlay-dashboard.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.dashboard-content {
+    position: absolute;
+    top: 2%;
+    left: 2%;
+    width: 96%;
+    height: 96%;
+    background: white;
+    border-radius: 20px;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* BOTONES FLOTANTES CIRCULARES MEJORADOS */
+.floating-buttons {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.float-btn-circle {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.float-btn-circle:hover {
+    width: 160px;
+    border-radius: 30px;
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(220, 38, 38, 0.6);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.float-btn-circle .btn-text {
+    position: absolute;
+    left: 70px;
+    font-weight: 600;
+    font-size: 14px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+    white-space: nowrap;
+}
+
+.float-btn-circle:hover .btn-text {
+    opacity: 1;
+    visibility: visible;
+}
+
+.float-btn-circle svg {
+    transition: transform 0.4s ease;
+    z-index: 1;
+}
+
+.float-btn-circle:hover svg {
+    transform: translateX(-35px);
+}
+
+/* Botones normales del dashboard */
+.float-btn {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 15px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+    justify-content: center;
+}
+
+.float-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(220, 38, 38, 0.6);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.float-btn.data {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+.float-btn.data:hover {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.6);
+}
+
+.float-btn.active-data {
+    background: linear-gradient(135deg, #10b981, #047857);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+.float-btn.active-data:hover {
+    background: linear-gradient(135deg, #34d399, #10b981);
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.6);
+}
+
+/* Pestañas */
+.tab-buttons {
+    display: flex;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 30px;
+    gap: 10px;
+}
+
+.tab-btn {
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    color: #6b7280;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    border-radius: 8px 8px 0 0;
+}
+
+.tab-btn:hover {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.tab-btn.active {
+    color: #dc2626;
+    border-bottom-color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+/* Contenido de pestañas */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estadísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-item {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* ✨ GRÁFICOS EXPANDIDOS - NUEVO GRID */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+.charts-grid-expanded {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 32px;
+}
+
+@media (max-width: 1400px) {
+    .charts-grid-expanded {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .charts-grid-expanded {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chart-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container-large {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* ✨ NUEVOS CONTENEDORES PARA GRÁFICOS EXPANDIDOS */
+.chart-container-medium {
+    position: relative;
+    height: 280px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.chart-container-small {
+    position: relative;
+    height: 220px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.chart-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chart-subtitle {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* ELEMENTOS INTERACTIVOS OPTIMIZADOS */
+.country-item, .top-item {
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e5e7eb;
+    background: white;
+    margin-bottom: 8px;
+}
+
+.country-item:hover, .top-item:hover {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.15);
+}
+
+.country-item.active, .top-item.active {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border-color: #dc2626;
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.2);
+}
+
+/* CLASES DE ANIMACIÓN FLUIDA */
+.hover-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.interactive-ranking {
+    position: relative;
+    overflow: hidden;
+}
+
+.interactive-ranking::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.interactive-ranking:hover::before {
+    left: 100%;
+}
+
+/* Barras de progreso optimizadas */
+.progress-bar {
+    width: 100%;
+    height: 5px;
+    background: #f3f4f6;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #dc2626, #ef4444, #f87171);
+    border-radius: 3px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Tooltips personalizados */
+.custom-tooltip {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.custom-tooltip .leaflet-tooltip-content {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Animaciones adicionales optimizadas */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+/* Aplicar animaciones */
+.country-item, .top-item {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.floating-buttons {
+    animation: slideInRight 0.6s ease-out;
+}
+
+.notification.show {
+    animation: bounceIn 0.5s ease-out;
+}
+
+/* Estados de carga optimizados */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f4f6;
+    border-top: 2px solid #dc2626;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Mejoras para accesibilidad */
+.country-item:focus,
+.top-item:focus,
+.float-btn-circle:focus,
+.float-btn:focus {
+    outline: 2px solid #dc2626;
+    outline-offset: 2px;
+}
+
+/* Mejoras para el scrollbar */
+.dashboard-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dashboard-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.dashboard-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+.dashboard-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ANIMACIONES PERSONALIZADAS PARA EL MAPA */
+.leaflet-marker-icon {
+    transition: transform 0.3s ease !important;
+}
+
+.leaflet-marker-icon:hover {
+    transform: scale(1.1) !important;
+}
+
+/* Efecto de highlight para marcadores */
+@keyframes markerPulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.3);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.marker-highlight {
+    animation: markerPulse 0.6s ease-in-out;
+}
+
+/* ESTILOS PARA FILTROS ACTIVOS Y FEEDBACK VISUAL */
+.filter-active {
+    border: 2px solid #dc2626 !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.3) !important;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2) !important;
+}
+
+.filter-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.filter-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    border: 2px solid #f3f4f6;
+    border-top: 2px solid #dc2626;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Efecto de highlight para elementos filtrados */
+.highlight-filter {
+    animation: highlightPulse 1.5s ease-in-out;
+}
+
+@keyframes highlightPulse {
+    0% { 
+        background-color: rgba(220, 38, 38, 0.1);
+        transform: scale(1);
+    }
+    50% { 
+        background-color: rgba(220, 38, 38, 0.2);
+        transform: scale(1.02);
+    }
+    100% { 
+        background-color: transparent;
+        transform: scale(1);
+    }
+}
+
+/* Mejoras en selectores de filtros */
+select:focus {
+    outline: none;
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+select option {
+    padding: 8px 12px;
+    background: white;
+    color: #374151;
+}
+
+select option:hover,
+select option:checked {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+/* Estados hover mejorados para rankings */
+.country-item:hover .progress-fill,
+.top-item:hover .progress-fill {
+    animation: shimmer 1s ease-in-out;
+}
+
+/* Transiciones suaves para todos los elementos */
+* {
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Optimizaciones de rendimiento */
+.overlay-dashboard,
+.map-container-fullscreen {
+    will-change: transform, opacity;
+}
+
+.float-btn-circle,
+.country-item,
+.top-item,
+.interactive-ranking {
+    will-change: transform;
+}
+
+/* Mejoras de hardware acceleration */
+.float-btn-circle,
+.notification,
+.progress-fill,
+.country-item,
+.top-item {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Responsive adjustments optimizados */
+@media (max-width: 768px) {
+    .dashboard-content {
+        top: 1%;
+        left: 1%;
+        width: 98%;
+        height: 98%;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .float-btn-circle {
+        width: 50px;
+        height: 50px;
+    }
+
+    .float-btn-circle:hover {
+        width: 140px;
+    }
+
+    .float-btn-circle .btn-text {
+        left: 55px;
+        font-size: 12px;
+    }
+
+    .float-btn-circle:hover svg {
+        transform: translateX(-25px);
+    }
+
+    .floating-buttons {
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .chart-container-large {
+        height: 300px;
+    }
+
+    .chart-container-medium {
+        height: 250px;
+    }
+
+    .chart-container-small {
+        height: 200px;
+    }
+
+    .notification {
+        right: 10px;
+        left: 10px;
+        width: auto;
+        transform: translateY(-100px);
+    }
+
+    .notification.show {
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tab-buttons {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .tab-btn {
+        border-radius: 8px;
+        border-bottom: none;
+        border-left: 3px solid transparent;
+    }
+
+    .tab-btn.active {
+        border-left-color: #dc2626;
+        border-bottom: none;
+    }
+
+    .float-btn-circle {
+        width: 45px;
+        height: 45px;
+    }
+
+    .float-btn-circle:hover {
+        width: 120px;
+    }
+
+    .float-btn-circle .btn-text {
+        left: 50px;
+        font-size: 11px;
+    }
+
+    .float-btn-circle:hover svg {
+        transform: translateX(-20px);
+    }
+
+    .chart-container-large {
+        height: 250px;
+    }
+
+    .chart-container-medium {
+        height: 220px;
+    }
+
+    .chart-container-small {
+        height: 180px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .chart-title {
+        font-size: 16px;
+    }
+
+    .chart-subtitle {
+        font-size: 12px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .floating-buttons,
+    .fullscreen-btn,
+    .notification {
+        display: none !important;
+    }
+    
+    .overlay-dashboard {
+        position: static !important;
+        background: white !important;
+        backdrop-filter: none !important;
+    }
+    
+    .dashboard-content {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        box-shadow: none !important;
+    }
+}

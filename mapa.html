@@ -1,0 +1,650 @@
+<!-- Ruta: mapa.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Calor - Análisis Geográfico Colombia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gradient-to-br from-red-50 to-orange-100 min-h-screen">
+    
+    <!-- Notificación flotante -->
+    <div id="notification" class="notification">
+        <span id="notification-text"></span>
+    </div>
+    
+    <!-- Header -->
+    <header class="glass-effect border-b shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                        Mapa de Calor
+                    </h1>
+                    <p class="text-gray-600 mt-2 text-lg">Concentraciones de datos por región</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex items-center gap-4">
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <span>Sistema activo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+            
+            <!-- Mapa principal sticky -->
+            <div id="map-column" class="xl:col-span-2">
+                <div id="map-container" class="map-sticky glass-effect rounded-2xl shadow-xl overflow-hidden">
+                    <div class="p-6 border-b bg-gradient-to-r from-red-600 to-orange-600">
+                        <h2 class="text-2xl font-bold text-white">Mapa de Calor</h2>
+                        <p class="text-red-100 mt-1">Concentraciones de datos por región</p>
+                    </div>
+                    <div class="relative">
+                        <div id="map" class="w-full h-[600px] relative">
+                            <div id="loading-overlay" class="loading-overlay">
+                                <div class="loading-spinner"></div>
+                                <p class="mt-4 text-gray-600 font-medium">Cargando visualización...</p>
+                            </div>
+                        </div>
+                        <button id="fullscreen-btn" class="fullscreen-btn">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                            </svg>
+                            Pantalla completa
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel lateral -->
+            <div id="sidebar-column" class="xl:col-span-2 space-y-6">
+                <!-- Filtros -->
+                <div class="glass-effect rounded-2xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"></path>
+                        </svg>
+                        Filtros
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">País</label>
+                                <select id="filtroPais" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all">
+                                    <option value="Todos">Todos los países</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nivel Académico</label>
+                                <select id="filtroNivel" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all">
+                                    <option value="Todos">Todos los niveles</option>
+                                    <option value="Pregrado">Pregrado</option>
+                                    <option value="Posgrado">Posgrado</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Departamento</label>
+                                <select id="filtroDepartamento" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all">
+                                    <option value="Todos">Todos los departamentos</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Rango de Registros</label>
+                                <select id="filtroRango" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all">
+                                    <option value="Todos">Todos los rangos</option>
+                                    <option value="1-10">1 - 10 registros</option>
+                                    <option value="11-50">11 - 50 registros</option>
+                                    <option value="51-100">51 - 100 registros</option>
+                                    <option value="100+">Más de 100 registros</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pt-2">
+                            <button id="limpiarFiltros" class="px-6 py-2 text-gray-600 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-300">
+                                Limpiar Filtros
+                            </button>
+                            <div id="filtrosActivos" class="text-sm text-gray-600 font-medium">
+                                Sin filtros activos
+                            </div>
+                        </div>
+                        
+                        <!-- Indicador de resultados -->
+                        <div id="resultadosFiltros" class="bg-blue-50 rounded-lg p-3 text-sm text-blue-800 hidden">
+                            <span id="textoResultados"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen estadístico -->
+                <div class="glass-effect rounded-2xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Resumen General
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gradient-to-r from-red-500 to-red-600 p-4 rounded-xl text-white text-center">
+                            <p class="text-red-100 text-sm font-medium">Registros</p>
+                            <p id="totalRegistros" class="text-3xl font-bold">0</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-xl text-white text-center">
+                            <p class="text-blue-100 text-sm font-medium">Pregrado</p>
+                            <p id="totalPregrado" class="text-3xl font-bold">0</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-green-500 to-green-600 p-4 rounded-xl text-white text-center">
+                            <p class="text-green-100 text-sm font-medium">Posgrado</p>
+                            <p id="totalPosgrado" class="text-3xl font-bold">0</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-4 rounded-xl text-white text-center">
+                            <p class="text-purple-100 text-sm font-medium">Municipios</p>
+                            <p id="totalMunicipios" class="text-3xl font-bold">0</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-4 rounded-xl text-white text-center">
+                            <p class="text-orange-100 text-sm font-medium">Departamentos</p>
+                            <p id="totalDepartamentos" class="text-3xl font-bold">0</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 p-4 rounded-xl text-white text-center">
+                            <p class="text-indigo-100 text-sm font-medium">Países</p>
+                            <p id="totalPaises" class="text-3xl font-bold">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navegación por países -->
+                <div class="glass-effect rounded-2xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Navegación por Países
+                    </h3>
+                    <div id="listaPaises" class="space-y-3 max-h-48 overflow-y-auto"></div>
+                </div>
+
+                <!-- Top rankings -->
+                <div class="glass-effect rounded-2xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                        </svg>
+                        Rankings
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2">Departamentos</h4>
+                            <div id="topDepartamentos" class="space-y-2 max-h-64 overflow-y-auto pr-2"></div>
+                        </div>
+                        <div class="mt-4">
+                            <h4 class="font-semibold text-gray-700 mb-2">Municipios</h4>
+                            <div id="topMunicipios" class="space-y-2 max-h-64 overflow-y-auto pr-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Botones flotantes circulares -->
+    <div class="floating-buttons">
+        <button id="dashboard-toggle" class="float-btn-circle">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <span class="btn-text">Dashboard</span>
+        </button>
+        <button id="stats-toggle" class="float-btn-circle">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+            </svg>
+            <span class="btn-text">Estadísticas</span>
+        </button>
+    </div>
+
+    <!-- Overlay Dashboard -->
+    <div id="overlay-dashboard" class="overlay-dashboard">
+        <div class="dashboard-content">
+            <div class="p-8">
+                <!-- Header del dashboard -->
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">Dashboard</h2>
+                        <p class="text-gray-600 mt-1">Análisis completo de datos geográficos</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium text-gray-700">Mostrar:</label>
+                            <select id="topN-control" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm">
+                                <option value="5">Top 5</option>
+                                <option value="10" selected>Top 10</option>
+                                <option value="15">Top 15</option>
+                                <option value="20">Top 20</option>
+                                <option value="all">Todos</option>
+                            </select>
+                        </div>
+                        <button id="toggle-data-labels-dashboard" class="float-btn data text-sm py-2 px-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2z"></path>
+                            </svg>
+                            <span>Datos Numéricos</span>
+                        </button>
+                        <button id="close-dashboard" class="text-gray-500 hover:text-gray-700 text-3xl font-light transition-colors">&times;</button>
+                    </div>
+                </div>
+
+                <!-- Pestañas -->
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="departamentos">Por Departamentos</button>
+                    <button class="tab-btn" data-tab="municipios">Por Municipios</button>
+                    <button class="tab-btn" data-tab="paises">Por Países</button>
+                </div>
+
+                <!-- Contenido por Departamentos -->
+                <div id="tab-departamentos" class="tab-content active">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="dept-total-registros">0</div>
+                            <div class="stat-label">Total de registros</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="dept-total-departamentos">0</div>
+                            <div class="stat-label">Departamentos con registros</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="dept-promedio">0</div>
+                            <div class="stat-label">Promedio de registros por departamento</div>
+                        </div>
+                    </div>
+
+                    <!-- GRÁFICOS EXPANDIDOS PARA DEPARTAMENTOS -->
+                    <div class="charts-grid-expanded">
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                Top Departamentos
+                            </div>
+                            <div class="chart-subtitle">Departamentos con mayor número de registros</div>
+                            <div class="chart-container-medium">
+                                <canvas id="deptBarChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                                </svg>
+                                Distribución Porcentual
+                            </div>
+                            <div class="chart-subtitle">Porcentaje de registros por departamento</div>
+                            <div class="chart-container-medium">
+                                <canvas id="deptPieChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                                </svg>
+                                Pregrado Departamental
+                            </div>
+                            <div class="chart-subtitle">Distribución de registros de pregrado</div>
+                            <div class="chart-container-medium">
+                                <canvas id="deptPregradoChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                                </svg>
+                                Posgrado Departamental
+                            </div>
+                            <div class="chart-subtitle">Distribución de registros de posgrado</div>
+                            <div class="chart-container-medium">
+                                <canvas id="deptPosgradoChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                Pregrado vs Posgrado
+                            </div>
+                            <div class="chart-subtitle">Comparativa por departamento</div>
+                            <div class="chart-container-medium">
+                                <canvas id="deptComparativaChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                Análisis Radar
+                            </div>
+                            <div class="chart-subtitle">Distribución multidimensional</div>
+                            <div class="chart-container-medium">
+                                <canvas id="deptRadarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contenido por Municipios -->
+                <div id="tab-municipios" class="tab-content">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="mun-total-registros">0</div>
+                            <div class="stat-label">Total de registros</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="mun-total-municipios">0</div>
+                            <div class="stat-label">Municipios con registros</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="mun-promedio">0</div>
+                            <div class="stat-label">Promedio de registros por municipio</div>
+                        </div>
+                    </div>
+
+                    <!-- GRÁFICOS EXPANDIDOS PARA MUNICIPIOS -->
+                    <div class="charts-grid-expanded">
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                Top Municipios
+                            </div>
+                            <div class="chart-subtitle">Municipios con mayor número de registros</div>
+                            <div class="chart-container-medium">
+                                <canvas id="munBarChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                                </svg>
+                                Comparación Porcentual
+                            </div>
+                            <div class="chart-subtitle">Distribución de registros como porcentaje del total</div>
+                            <div class="chart-container-medium">
+                                <canvas id="munPieChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                </svg>
+                                Por Departamento
+                            </div>
+                            <div class="chart-subtitle">Distribución de municipios por departamento</div>
+                            <div class="chart-container-medium">
+                                <canvas id="munPorDeptChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                                Densidad Municipal
+                            </div>
+                            <div class="chart-subtitle">Concentración de registros por municipio</div>
+                            <div class="chart-container-medium">
+                                <canvas id="munDensidadChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                Ranking Horizontal
+                            </div>
+                            <div class="chart-subtitle">Top municipios vista horizontal</div>
+                            <div class="chart-container-medium">
+                                <canvas id="munHorizontalChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                                Análisis de Concentración
+                            </div>
+                            <div class="chart-subtitle">Concentración relativa por municipio</div>
+                            <div class="chart-container-medium">
+                                <canvas id="munBubbleChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contenido por Países -->
+                <div id="tab-paises" class="tab-content">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="pais-total-registros">0</div>
+                            <div class="stat-label">Total de registros</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="pais-total-paises">0</div>
+                            <div class="stat-label">Países detectados</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="pais-mas-registros">-</div>
+                            <div class="stat-label">País con más registros</div>
+                        </div>
+                    </div>
+
+                    <!-- GRÁFICOS EXPANDIDOS PARA PAÍSES -->
+                    <div class="charts-grid-expanded">
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Distribución por Países
+                            </div>
+                            <div class="chart-subtitle">Distribución de registros por países</div>
+                            <div class="chart-container-medium">
+                                <canvas id="paisPieChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                Comparativa entre Países
+                            </div>
+                            <div class="chart-subtitle">Cantidad de registros por país</div>
+                            <div class="chart-container-medium">
+                                <canvas id="paisBarChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                                </svg>
+                                Pregrado Internacional
+                            </div>
+                            <div class="chart-subtitle">Distribución de pregrado por país</div>
+                            <div class="chart-container-medium">
+                                <canvas id="paisPregradoChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                                </svg>
+                                Posgrado Internacional
+                            </div>
+                            <div class="chart-subtitle">Distribución de posgrado por país</div>
+                            <div class="chart-container-medium">
+                                <canvas id="paisPosgradoChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                Niveles por País
+                            </div>
+                            <div class="chart-subtitle">Pregrado vs Posgrado internacional</div>
+                            <div class="chart-container-medium">
+                                <canvas id="paisNivelesChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                                Intensidad Global
+                            </div>
+                            <div class="chart-subtitle">Concentración internacional de registros</div>
+                            <div class="chart-container-medium">
+                                <canvas id="paisHeatmapChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay de Estadísticas Detalladas -->
+    <div id="overlay-stats" class="overlay-dashboard">
+        <div class="dashboard-content">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">Estadísticas Detalladas</h2>
+                        <p class="text-gray-600 mt-1">Análisis completo por nivel académico</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium text-gray-700">Mostrar:</label>
+                            <select id="topN-control-stats" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm">
+                                <option value="5">Top 5</option>
+                                <option value="10" selected>Top 10</option>
+                                <option value="15">Top 15</option>
+                                <option value="20">Top 20</option>
+                                <option value="all">Todos</option>
+                            </select>
+                        </div>
+                        <button id="toggle-data-labels-stats" class="float-btn data text-sm py-2 px-4">
+                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2z"></path>
+                            </svg>
+                           <span>Datos Numéricos</span>
+                        </button>
+                        <button id="close-stats" class="text-gray-500 hover:text-gray-700 text-3xl font-light transition-colors">&times;</button>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-title">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                            Distribución por Nivel Académico
+                        </div>
+                        <div class="chart-subtitle">Comparación entre Pregrado y Posgrado</div>
+                        <div class="chart-container-large">
+                            <canvas id="nivelesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-title">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Pregrado por Departamento
+                        </div>
+                        <div class="chart-subtitle">Top 10 departamentos con registros de pregrado</div>
+                        <div class="chart-container-large">
+                            <canvas id="pregradoChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-title">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Posgrado por Departamento
+                        </div>
+                        <div class="chart-subtitle">Top 10 departamentos con registros de posgrado</div>
+                        <div class="chart-container-large">
+                            <canvas id="posgradoChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-title">
+                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                            </svg>
+                            Comparativa por Países
+                        </div>
+                        <div class="chart-subtitle">Distribución de niveles académicos por país</div>
+                        <div class="chart-container-large">
+                            <canvas id="nivelesXPaisChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de carga en orden correcto -->
+    <script src="datos.js"></script>
+    <script src="mapa-config.js"></script>
+    <script src="graficos-botones.js"></script>
+</body>
+</html>
