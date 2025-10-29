@@ -3424,9 +3424,24 @@ window.datosColombiaTexto =
 170	Colombia	5209	Concordia	Pregrado
 170	Colombia	25312	Granada	Pregrado
 170	Colombia	25290	Fusagasuga	Pregrado
-170	Colombia	25290	Fusagasuga	Pregrado`;	
+170	Colombia	25290	Fusagasuga	Pregrado
+170	Colombia	11001	Bogota, D.C.	Posgrado
+170	Colombia	25269	Facatativa	Posgrado
+170	Colombia	25173	Contratacion	Posgrado
+170	Colombia	25269	Facatativa	Posgrado
+170	Colombia	11001	Bogota, D.C.	Posgrado
+170	Colombia	25269	Facatativa	Posgrado
+170	Colombia	25269	Facatativa	Posgrado
+170	Colombia	25269	Facatativa	Posgrado
+170	Colombia	25269	Facatativa	Posgrado
+170	Colombia	25269	Facatativa	Posgrado
+170	Colombia	25467	Mosquera	Posgrado
+170	Colombia	11001	Bogota, D.C.	Posgrado
+170	Colombia	25430	Madrid	Posgrado
+170	Colombia	25049	Alban	Posgrado`;	
 
 // Indicador de que los datos están disponibles
 window.datosColombiaListo = true	
+
 
 console.log('Datos de Colombia cargados correctamente')	
